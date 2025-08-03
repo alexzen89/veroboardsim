@@ -172,15 +172,26 @@ export function createPerfboardSimulator(config) {
     for (let col = 0; col < cols; col++) {
       const x = offsetX + col * spacing;
       const y = offsetY + row * spacing;
+      // Invisible clickable area
+      const hitbox = createElementNS("circle", {
+        cx: x,
+        cy: y,
+        r: holeRadius + 5,
+        fill: "transparent",
+        style: "cursor: pointer;",
+        "pointer-events": "all",
+      });
+
+      // Visible black hole
       const circle = createElementNS("circle", {
         cx: x,
         cy: y,
         r: holeRadius,
         fill: "black",
-        style: "cursor: pointer;",
+        "pointer-events": "none", // Make sure only hitbox handles events
       });
 
-      circle.addEventListener("click", () => {
+      hitbox.addEventListener("click", () => {
         const cutKey = `${row}-${col}`;
         let fillColor = "";
         if (cutMode) {
@@ -221,7 +232,9 @@ export function createPerfboardSimulator(config) {
         } else {
           // Allow wires between different strips and not across cuts
           let isSameStrip = selected.row === row;
-          let isCut = cuts.has(`${selected.row}-${selected.col}`) || cuts.has(`${row}-${selected.col}`);
+          let isCut =
+            cuts.has(`${selected.row}-${selected.col}`) ||
+            cuts.has(`${row}-${selected.col}`);
           if (!isSameStrip && !isCut) {
             const line = createElementNS("line", {
               x1: selected.coord[0],
@@ -248,6 +261,7 @@ export function createPerfboardSimulator(config) {
         }
       });
 
+      holeGroup.appendChild(hitbox);
       holeGroup.appendChild(circle);
     }
   }
