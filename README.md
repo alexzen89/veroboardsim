@@ -2,4 +2,4 @@
 │
 ├── index.html
 ├── style.css
-└── perfboard.js
+└── board.js

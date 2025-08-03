@@ -1,0 +1,11 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #eee;
+}
+
+#board {
+  background: #d4a373;
+  border: 1px solid #999;
+  margin-top: 20px;
+}

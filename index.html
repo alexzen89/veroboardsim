@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Perfboard Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <label style="margin: 10px;">
+    Select Wire Color:
+    <input type="color" id="colorPicker" value="#ff0000" style="margin-left: 10px;" />
+  </label>
+
+  <svg id="board"></svg>
+
+  <script type="module">
+    import { createPerfboardSimulator } from './board.js';
+
+    createPerfboardSimulator({
+      svgId: 'board',
+      rows: 20,
+      cols: 30,
+      spacing: 20,
+      holeRadius: 3,
+      offsetX: 30,
+      offsetY: 30,
+      stripGap: 4,
+      colorPickerId: 'colorPicker'
+    });
+  </script>
+</body>
+</html>
