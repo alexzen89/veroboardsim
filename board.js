@@ -30,6 +30,33 @@ export function createPerfboardSimulator(config) {
   cutBtn.addEventListener("click", cutTrackMode);
   wireBtn.addEventListener("click", wireAddMode);
 
+  // color buttons
+  const zeroBtn = document.getElementById("zeroBtn");
+  const oneBtn = document.getElementById("oneBtn");
+  const twoBtn = document.getElementById("twoBtn");
+  const threeBtn = document.getElementById("threeBtn");
+  const fourBtn = document.getElementById("fourBtn");
+  const fiveBtn = document.getElementById("fiveBtn");
+  const sixBtn = document.getElementById("sixBtn");
+  const sevenBtn = document.getElementById("sevenBtn");
+  const eightBtn = document.getElementById("eightBtn");
+  const nineBtn = document.getElementById("nineBtn");
+
+  function setColorPicker(color) {
+    colorPicker.value = color;
+  }
+
+  zeroBtn.addEventListener("click", () => setColorPicker("#000000"));
+  oneBtn.addEventListener("click", () => setColorPicker("#5c2424"));
+  twoBtn.addEventListener("click", () => setColorPicker("#FF0000"));
+  threeBtn.addEventListener("click", () => setColorPicker("#FFA500"));
+  fourBtn.addEventListener("click", () => setColorPicker("#FFFF00"));
+  fiveBtn.addEventListener("click", () => setColorPicker("#008000"));
+  sixBtn.addEventListener("click", () => setColorPicker("#0000FF"));
+  sevenBtn.addEventListener("click", () => setColorPicker("#EE82EE"));
+  eightBtn.addEventListener("click", () => setColorPicker("#808080"));
+  nineBtn.addEventListener("click", () => setColorPicker("#FFFFFF"));
+
   function undo() {
     if (undoStack.length === 0) return;
     const last = undoStack.pop();
@@ -80,6 +107,16 @@ export function createPerfboardSimulator(config) {
   }
 
   document.addEventListener("keydown", (e) => {
+    if (e.key === "0") setColorPicker("#000000");
+    if (e.key === "1") setColorPicker("#5c2424");
+    if (e.key === "2") setColorPicker("#FF0000");
+    if (e.key === "3") setColorPicker("#FFA500");
+    if (e.key === "4") setColorPicker("#FFFF00");
+    if (e.key === "5") setColorPicker("#008000");
+    if (e.key === "6") setColorPicker("#0000FF");
+    if (e.key === "7") setColorPicker("#EE82EE");
+    if (e.key === "8") setColorPicker("#808080");
+    if (e.key === "9") setColorPicker("#FFFFFF");
     if (e.key === "w") wireAddMode();
     if (e.key === "c") cutTrackMode();
     if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
