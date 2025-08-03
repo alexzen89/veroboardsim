@@ -24,10 +24,11 @@ export function createPerfboardSimulator(config) {
   const undoBtn = document.getElementById("undoBtn");
   const redoBtn = document.getElementById("redoBtn");
   const cutBtn = document.getElementById("cutBtn");
-
+  const wireBtn = document.getElementById("wireBtn");
   undoBtn.addEventListener("click", undo);
   redoBtn.addEventListener("click", redo);
-  cutBtn.addEventListener("click", toggleCutTrack);
+  cutBtn.addEventListener("click", cutTrackMode);
+  wireBtn.addEventListener("click", wireAddMode);
 
   function undo() {
     if (undoStack.length === 0) return;
@@ -63,12 +64,24 @@ export function createPerfboardSimulator(config) {
     }
   }
 
-  function toggleCutTrack() {
-    cutMode = !cutMode;
+  cutBtn.style.background = cutMode ? "#f88" : "";
+  wireBtn.style.background = cutMode ? "" : "#f88";
+
+  function cutTrackMode() {
+    cutMode = true;
     cutBtn.style.background = cutMode ? "#f88" : "";
+    wireBtn.style.background = cutMode ? "" : "#f88";
+  }
+
+  function wireAddMode() {
+    cutMode = false;
+    cutBtn.style.background = cutMode ? "#f88" : "";
+    wireBtn.style.background = cutMode ? "" : "#f88";
   }
 
   document.addEventListener("keydown", (e) => {
+    if (e.key === "w") wireAddMode();
+    if (e.key === "c") cutTrackMode();
     if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
       e.preventDefault();
       if (e.shiftKey) {
