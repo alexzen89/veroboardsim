@@ -169,8 +169,10 @@ export function createPerfboardSimulator(config) {
           selected = { row, col, coord: [x, y], element: circle };
           circle.setAttribute("fill", "red");
         } else {
-          const isSameStrip = selected.row === row;
-          if (!isSameStrip) {
+          // Allow wires between different strips and not across cuts
+          let isSameStrip = selected.row === row;
+          let isCut = cuts.has(`${selected.row}-${selected.col}`) || cuts.has(`${row}-${selected.col}`);
+          if (!isSameStrip && !isCut) {
             const line = createElementNS("line", {
               x1: selected.coord[0],
               y1: selected.coord[1],
