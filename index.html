@@ -7,10 +7,14 @@
 </head>
 <body>
 
-  <label style="margin: 10px;">
+  <div style="margin: 10px;">
+  <label>
     Select Wire Color:
     <input type="color" id="colorPicker" value="#ff0000" style="margin-left: 10px;" />
   </label>
+  <button id="undoBtn" style="margin-left: 20px;">Undo ⎌</button>
+  <button id="redoBtn" style="margin-left: 10px;">Redo ↻</button>
+  </div>
 
   <svg id="board"></svg>
 

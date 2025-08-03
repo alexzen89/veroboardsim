@@ -8,13 +8,61 @@ export function createPerfboardSimulator(config) {
     offsetX,
     offsetY,
     stripGap,
-    colorPickerId
+    colorPickerId,
   } = config;
 
   const svg = document.getElementById(svgId);
   const colorPicker = document.getElementById(colorPickerId);
   let selected = null;
   const connections = [];
+  const undoStack = [];
+  const redoStack = [];
+
+  const undoBtn = document.getElementById("undoBtn");
+  const redoBtn = document.getElementById("redoBtn");
+
+  function undo() {
+    if (undoStack.length === 0) return;
+    const last = undoStack.pop();
+    wireGroup.removeChild(last.element);
+    connections.pop();
+    redoStack.push(last);
+  }
+
+  function redo() {
+    if (redoStack.length === 0) return;
+    const conn = redoStack.pop();
+    const line = createElementNS("line", {
+      x1: conn.from[0],
+      y1: conn.from[1],
+      x2: conn.to[0],
+      y2: conn.to[1],
+      stroke: conn.color,
+      "stroke-width": 5,
+    });
+    wireGroup.appendChild(line);
+    const restored = { ...conn, element: line };
+    connections.push(restored);
+    undoStack.push(restored);
+  }
+
+  undoBtn.addEventListener("click", undo);
+  redoBtn.addEventListener("click", redo);
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
+      e.preventDefault();
+      if (e.shiftKey) {
+        redo();
+      } else {
+        undo();
+      }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
+      e.preventDefault();
+      redo();
+    }
+  });
 
   function createElementNS(type, attrs) {
     const elem = document.createElementNS("http://www.w3.org/2000/svg", type);
@@ -45,7 +93,7 @@ export function createPerfboardSimulator(config) {
       width: cols * spacing + spacing,
       height: (holeRadius + stripGap) * 2,
       fill: "#c67134",
-      rx: "2"
+      rx: "2",
     });
     stripGroup.appendChild(rect);
   }
@@ -60,7 +108,7 @@ export function createPerfboardSimulator(config) {
         cy: y,
         r: holeRadius,
         fill: "black",
-        style: "cursor: pointer;"
+        style: "cursor: pointer;",
       });
 
       circle.addEventListener("click", () => {
@@ -76,10 +124,18 @@ export function createPerfboardSimulator(config) {
               x2: x,
               y2: y,
               stroke: colorPicker.value,
-              "stroke-width": 5
+              "stroke-width": 5,
             });
             wireGroup.appendChild(line);
-            connections.push({ from: selected.coord, to: [x, y], color: colorPicker.value });
+            const conn = {
+              from: selected.coord,
+              to: [x, y],
+              color: colorPicker.value,
+              element: line,
+            };
+            connections.push(conn);
+            undoStack.push(conn);
+            redoStack.length = 0; // clear redo stack
           }
           selected.element.setAttribute("fill", "black");
           selected = null;
