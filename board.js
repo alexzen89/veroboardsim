@@ -17,37 +17,56 @@ export function createPerfboardSimulator(config) {
   const connections = [];
   const undoStack = [];
   const redoStack = [];
+  const cuts = new Set(); // holds keys like 'row-col'
+
+  let cutMode = false;
 
   const undoBtn = document.getElementById("undoBtn");
   const redoBtn = document.getElementById("redoBtn");
+  const cutBtn = document.getElementById("cutBtn");
+
+  undoBtn.addEventListener("click", undo);
+  redoBtn.addEventListener("click", redo);
+  cutBtn.addEventListener("click", toggleCutTrack);
 
   function undo() {
     if (undoStack.length === 0) return;
     const last = undoStack.pop();
     wireGroup.removeChild(last.element);
-    connections.pop();
+    if (last.type === "cut") cuts.delete(last.key);
+    else if (last.type === "wire") connections.pop();
     redoStack.push(last);
   }
 
   function redo() {
     if (redoStack.length === 0) return;
-    const conn = redoStack.pop();
-    const line = createElementNS("line", {
-      x1: conn.from[0],
-      y1: conn.from[1],
-      x2: conn.to[0],
-      y2: conn.to[1],
-      stroke: conn.color,
-      "stroke-width": 5,
-    });
-    wireGroup.appendChild(line);
-    const restored = { ...conn, element: line };
-    connections.push(restored);
-    undoStack.push(restored);
+    const last = redoStack.pop();
+
+    if (last.type === "cut") {
+      cuts.add(last.key);
+      wireGroup.appendChild(last.element);
+      undoStack.push(last);
+    } else if (last.type === "wire") {
+      const line = createElementNS("line", {
+        x1: last.from[0],
+        y1: last.from[1],
+        x2: last.to[0],
+        y2: last.to[1],
+        stroke: last.color,
+        "stroke-width": 5,
+      });
+      wireGroup.appendChild(line);
+
+      const restored = { ...last, element: line };
+      connections.push(restored);
+      undoStack.push(restored);
+    }
   }
 
-  undoBtn.addEventListener("click", undo);
-  redoBtn.addEventListener("click", redo);
+  function toggleCutTrack() {
+    cutMode = !cutMode;
+    cutBtn.style.background = cutMode ? "#f88" : "";
+  }
 
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
@@ -112,9 +131,43 @@ export function createPerfboardSimulator(config) {
       });
 
       circle.addEventListener("click", () => {
+        const cutKey = `${row}-${col}`;
+        let fillColor = "";
+        if (cutMode) {
+          if (!cuts.has(cutKey)) {
+            cuts.add(cutKey);
+            fillColor = "#d4a373";
+          } else {
+            cuts.delete(cutKey);
+            fillColor = "#c67134";
+          }
+
+          // Draw a square to cover the strip at the hole
+          const cutCover = createElementNS("rect", {
+            x: x - spacing / 2,
+            y: y - (holeRadius + stripGap),
+            width: spacing,
+            height: (holeRadius + stripGap) * 2,
+            fill: fillColor,
+          });
+
+          wireGroup.appendChild(cutCover); // same group as wires
+
+          const cutAction = {
+            type: "cut",
+            key: cutKey,
+            element: cutCover,
+          };
+
+          undoStack.push(cutAction);
+          redoStack.length = 0;
+
+          return;
+        }
+
         if (!selected) {
           selected = { row, col, coord: [x, y], element: circle };
-          circle.setAttribute("fill", "orange");
+          circle.setAttribute("fill", "red");
         } else {
           const isSameStrip = selected.row === row;
           if (!isSameStrip) {
@@ -132,10 +185,11 @@ export function createPerfboardSimulator(config) {
               to: [x, y],
               color: colorPicker.value,
               element: line,
+              type: "wire",
             };
             connections.push(conn);
             undoStack.push(conn);
-            redoStack.length = 0; // clear redo stack
+            redoStack.length = 0;
           }
           selected.element.setAttribute("fill", "black");
           selected = null;
