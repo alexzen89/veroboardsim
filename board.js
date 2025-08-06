@@ -191,6 +191,14 @@ export function createPerfboardSimulator(config) {
         "pointer-events": "none", // Make sure only hitbox handles events
       });
 
+      // Highlight hole
+      hitbox.addEventListener("mouseover", () => {
+        hitbox.setAttribute("fill", "green");
+      });
+      hitbox.addEventListener("mouseout", () => {
+        hitbox.setAttribute("fill", "transparent");
+      });
+
       hitbox.addEventListener("click", () => {
         const cutKey = `${row}-${col}`;
         let fillColor = "";
