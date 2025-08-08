@@ -46,16 +46,20 @@ export function createPerfboardSimulator(config) {
     colorPicker.value = color;
   }
 
-  zeroBtn.addEventListener("click", () => setColorPicker("#000000"));
-  oneBtn.addEventListener("click", () => setColorPicker("#5c2424"));
-  twoBtn.addEventListener("click", () => setColorPicker("#FF0000"));
-  threeBtn.addEventListener("click", () => setColorPicker("#FFA500"));
-  fourBtn.addEventListener("click", () => setColorPicker("#FFFF00"));
-  fiveBtn.addEventListener("click", () => setColorPicker("#008000"));
-  sixBtn.addEventListener("click", () => setColorPicker("#0000FF"));
-  sevenBtn.addEventListener("click", () => setColorPicker("#EE82EE"));
-  eightBtn.addEventListener("click", () => setColorPicker("#808080"));
-  nineBtn.addEventListener("click", () => setColorPicker("#FFFFFF"));
+  function setupColorButton(btn, color) {
+    btn.addEventListener("click", () => setColorPicker(color));
+  }
+
+  setupColorButton(zeroBtn, "#000000");
+  setupColorButton(oneBtn, "#5c2424");
+  setupColorButton(twoBtn, "#FF0000");
+  setupColorButton(threeBtn, "#FFA500");
+  setupColorButton(fourBtn, "#FFFF00");
+  setupColorButton(fiveBtn, "#008000");
+  setupColorButton(sixBtn, "#0000FF");
+  setupColorButton(sevenBtn, "#EE82EE");
+  setupColorButton(eightBtn, "#808080");
+  setupColorButton(nineBtn, "#FFFFFF");
 
   function undo() {
     if (undoStack.length === 0) return;
